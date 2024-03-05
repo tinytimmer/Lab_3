@@ -11,10 +11,21 @@
  * Initializes all pins related to the LCD to be outputs
  */
 void initLCDPins(){
+  // set LCD pins to output
+  DDRA |= (1 << DDA0);
+  DDRA |= (1 << DDA1);
+  DDRA |= (1 << DDA2);
+  DDRA |= (1 << DDA3);
 
+  // next initialized RS and E
+  DDRH |= (1 << DDH5) | (1 << DDH6); 
+  
+  //finally initialized R/W
+  DDRH |= (1 << DDH4); 
 }
 
-
+//PB6 = pin 12 on board -> RS pin
+//PB4 = pin 10 on board -> enable pin
 
 /* 1. Assert bits to pins connected to DB[7:4] on the LCD screen
  *      a. data is an unsigned char which has 8 bits. Therefore, you
