@@ -57,6 +57,9 @@ int main(){
   moveCursor(1, 0);  // moves the cursor to 1,0 position
   writeString("Fast");
 
+  fourBitCommandWithDelay(0xC, 0); //first bit has to be 1 according to data sheet to set with DD RAM address
+  fourBitCommandWithDelay(0x0, 2000);
+
 // while loop from lab 2 for the blink LEDs
   delayMs(100/multiplier);
 	while (1) {

@@ -18,7 +18,7 @@ void initLCDPins(){
   DDRA |= (1 << DDA3);
 
   // next initialized RS and E
-  DDRH |= (1 << DDH5) | (1 << DDH6); 
+  DDRB |= (1 << DDB4) | (1 << DDB6); 
   
   //finally initialized R/W
   DDRH |= (1 << DDH4); 
@@ -26,6 +26,14 @@ void initLCDPins(){
 
 //PB6 = pin 12 on board -> RS pin
 //PB4 = pin 10 on board -> enable pin
+
+//decided to put in this function to make it easier to change the enable pin
+void assertEnable(){
+  PORTB |= (1 << PORTB4); //enable pin is high
+  delayUs(1);
+  PORTB &= ~(1 << PORTB4); //enable pin is low
+  delayUs(1);
+}
 
 /* 1. Assert bits to pins connected to DB[7:4] on the LCD screen
  *      a. data is an unsigned char which has 8 bits. Therefore, you
@@ -36,10 +44,11 @@ void initLCDPins(){
  *  4. delay the provided number in MICROseconds.
  */
 void fourBitCommandWithDelay(unsigned char data, unsigned int delay){
-
-  PORTA = data;
+  PORTB &= ~(1 << PORTB6);
+  PORTA = (PORTA & 0xF0) | (data & 0x0F); //asserts bits here
+  assertEnable();
+  delayUs(delay);
 }
-
 
 
 /* Similar to fourBitCommandWithDelay except that now all eight bits of command are
@@ -54,10 +63,19 @@ void fourBitCommandWithDelay(unsigned char data, unsigned int delay){
  * 6. delay the provided number in MICROseconds.
  */
 void eightBitCommandWithDelay(unsigned char command, unsigned int delay){
- 
+  PORTB |= (1 << PORTB6); //sets rs to high, its suppose to be high right? why wuld this be low again?
+  PORTA = (PORTA & 0xF0)|(command >> 4);// asserts the bits to top here
+  assertEnable();
+
+  PORTA = (PORTA & 0xF0) | (command & 0x0F); //assert bits to the bottom here
+  assertEnable();
+  delayUs(delay);
 }
 
-
+void writeCharacter(unsigned char character){
+  //This function use an 8 bit command to set the CGRAM Address, got from lecture slides
+eightBitCommandWithDelay(character, 46);
+}
 
 /* Similar to eightBitCommandWithDelay except that now RS should be high
  * 1. Assert bits to pins connected to DB[7:4] on the LCD screen
@@ -66,12 +84,9 @@ void eightBitCommandWithDelay(unsigned char command, unsigned int delay){
  * 4. Now set the lower four bits of character to appropriate bits in PORTA
  * 5. Assert high on enable pin, delay, and asset low on enable pin
  * 6. delay is always 46 MICROseconds for a character write
- */
-void writeCharacter(unsigned char character){
- 
-}
-
-
+ *
+ * why did this repeat if this is a different function?
+ * /
 
 
 /*
@@ -80,7 +95,11 @@ void writeCharacter(unsigned char character){
  * that this should just call writeCharacter multiple times.
  */
 void writeString(const char *string){
-
+  unsigned int i = 0;
+    while(i < strlen(string)){
+      writeCharacter(string[i]);
+      i++;
+    }
 }
 
 
@@ -90,7 +109,9 @@ void writeString(const char *string){
  * This can be done using the eightBitCommandWithDelay with correct arguments
  */
 void moveCursor(unsigned char x, unsigned char y){
-	
+	//to or 0x80 (setting D7 to 1), or'd with x << 6
+  //(sets DB6 to either a 0 or 1) (row 0 or row 1), or'd with y
+  eightBitCommandWithDelay(((0x80) | (x << 6) | (y)), 53);
 }
 
 
@@ -100,30 +121,40 @@ void moveCursor(unsigned char x, unsigned char y){
  */
 void initLCDProcedure(){
   // Delay 15 milliseconds
+  delayUs(15000);
 
   // Write 0b0011 to DB[7:4] and delay 4100 microseconds
-  
+  fourBitCommandWithDelay(0b0011, 4100);
+
   // Write 0b0011 to DB[7:4] and delay 100 microseconds
+  fourBitCommandWithDelay(0b0011, 100);
 
   // The data sheet does not make this clear, but at this point you are issuing
   // commands in two sets of four bits. You must delay after each command
   // (which is the second set of four bits) an amount specified on page 3 of
   // the data sheet.
   // write 0b0011 to DB[7:4] and 100us delay
+  //   thats good to know cuz I surely didnt get that info from the 
+  fourBitCommandWithDelay(0b0011, 100);
 
   // write 0b0010 to DB[7:4] and 100us delay.
+  fourBitCommandWithDelay(0b0010, 100);
 
   // Function set in the command table with 53us delay
+  eightBitCommandWithDelay(0b00101000, 53);
 
   // Display off in the command table with 53us delay
+  eightBitCommandWithDelay(0b00001000, 53);
 
   // Clear display in the command table. Remember the delay is longer!!!
+  eightBitCommandWithDelay(0b00000001, 3000);
 
   // Entry Mode Set in the command table.
+  eightBitCommandWithDelay(0b00000110, 53);
 
   // Display ON/OFF Control in the command table. (Yes, this is not specified),
   // in the data sheet, but you have to do it to get this to work. Yay datasheets!)
-
+  eightBitCommandWithDelay(0b00001100, 53);
 }
 
 
