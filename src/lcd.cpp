@@ -39,12 +39,12 @@ void assertEnable(){
  *      a. data is an unsigned char which has 8 bits. Therefore, you
  *         need assign the bottom 4 bits of "data" to the appropriate bits in
  *         PORTA
- *  2. This is a "command" signal, meaning RS should be Low
+ *  2. This is a "command" signal, meaning RS should be Low, NOTE TO SELF: why is low, whuolsnt we switch?
  *  3. Assert high on enable pin, delay, and asset low on enable pin
  *  4. delay the provided number in MICROseconds.
  */
 void fourBitCommandWithDelay(unsigned char data, unsigned int delay){
-  PORTB &= ~(1 << PORTB6);
+  PORTB |= (1 << PORTB6);
   PORTA = (PORTA & 0xF0) | (data & 0x0F); //asserts bits here
   assertEnable();
   delayUs(delay);
@@ -63,7 +63,7 @@ void fourBitCommandWithDelay(unsigned char data, unsigned int delay){
  * 6. delay the provided number in MICROseconds.
  */
 void eightBitCommandWithDelay(unsigned char command, unsigned int delay){
-  PORTB |= (1 << PORTB6); //sets rs to high, its suppose to be high right? why wuld this be low again?
+  PORTB &= ~(1 << PORTB6); 
   PORTA = (PORTA & 0xF0)|(command >> 4);// asserts the bits to top here
   assertEnable();
 
@@ -89,17 +89,27 @@ eightBitCommandWithDelay(character, 46);
  * /
 
 
+
 /*
  * Writes a provided string such as "Hello!" to the LCD screen. You should
  * remember that a c string always ends with the '\0' character and
  * that this should just call writeCharacter multiple times.
  */
 void writeString(const char *string){
-  unsigned int i = 0;
+    int i=0;
+    while(string[i]!='\0')
+    /* loop will go on till the NULL character
+    in the string */
+    { writeCharacter(string[i]);
+    // sending data on LCD byte by byte
+    i++;
+    }
+
+  /* unsigned int i = 0;
     while(i < strlen(string)){
       writeCharacter(string[i]);
       i++;
-    }
+    } */
 }
 
 
@@ -113,6 +123,13 @@ void moveCursor(unsigned char x, unsigned char y){
   //(sets DB6 to either a 0 or 1) (row 0 or row 1), or'd with y
   eightBitCommandWithDelay(((0x80) | (x << 6) | (y)), 53);
 }
+
+//got this from lecture slides
+ void setCGRAM(unsigned char x){
+  //This function use an 8 bit command to set the CGRAM Address
+  eightBitCommandWithDelay(x, 53);
+}
+ 
 
 
 /* This is the procedure outline on the LCD datasheet page 4 out of 9.

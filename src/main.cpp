@@ -31,15 +31,11 @@
     wait_press, button_press, wait_release, button_release
   }  stateType;
 
+// Initialize states.  Remember to use volatile 
   //next well make some volatile variables below
   volatile stateType state = wait_press;
   volatile int counter = 0;
   volatile int multiplier = NORMAL_SPEED;
-
-
-// Initialize states.  Remember to use volatile 
-
-
 
 
 int main(){
@@ -50,18 +46,35 @@ int main(){
   initLED();
   initTimer0();
   sei(); // Enable global interrupts.
-  
-  //dont know how Ill be doing this part but we shall see
-  moveCursor(0, 0); // moves the cursor to 0,0 position
-  writeString("Current mode: ");
-  moveCursor(1, 0);  // moves the cursor to 1,0 position
-  writeString("Fast");
 
-  fourBitCommandWithDelay(0xC, 0); //first bit has to be 1 according to data sheet to set with DD RAM address
-  fourBitCommandWithDelay(0x0, 2000);
+  // writing special character
+  /* unsigned char ArrayCh[]={0x00, 0x00, 0x0a, 0x00, 0x1f, 0x11, 0x0e, 0x00};
+  writeCharacter(0x00);
+  setCGRAM(0X40);
+  unsigned int i=0;
+  while(i<=7){
+    writeCharacter(ArrayCh[i]);
+    i++;
+  }
+  // move cursor
+  moveCursor(1,11); */
+ 
 
 // while loop from lab 2 for the blink LEDs
   delayMs(100/multiplier);
+  //this is for lab 3 below
+
+  //also got these from lecture slides
+  moveCursor(0, 0); // moves the cursor to 0,0 position
+  writeString("Currrent mode is:"); //write top line of LCD
+  moveCursor(1, 0); // moves the cursor to 1,0 position
+  
+  //writeString(0xF2); //display speed of default mode
+  writeCharacter(0xF2);
+  moveCursor(1,10);
+
+  //this is for lab 3 above
+
 	while (1) {
     //after 100ms code needs to increment the binary number which is represented by LEDs
     //here is the delay

@@ -14,10 +14,10 @@ void initLCDPins();
 void initLCDProcedure();
 void writeCharacter(unsigned char character);
 void writeString(const char *string);
+void setCGRAM(unsigned char character);
 
-
-void fourBitCommandWithDelay(unsigned char data, unsigned int delay); //this one is writeDataWithDelay()
-void eightBitCommandWithDelay(unsigned char command, unsigned int delay); //this one is writeCommanWithUsDelay()
+void fourBitCommandWithDelay(unsigned char data, unsigned int delay); 
+void eightBitCommandWithDelay(unsigned char command, unsigned int delay); 
 
 void moveCursor(unsigned char x, unsigned char y);
 
