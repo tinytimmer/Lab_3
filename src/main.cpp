@@ -31,12 +31,12 @@
     wait_press, button_press, wait_release, button_release
   }  stateType;
 
-// Initialize states.  Remember to use volatile 
+
   //next well make some volatile variables below
   volatile stateType state = wait_press;
   volatile int counter = 0;
   volatile int multiplier = NORMAL_SPEED;
-
+// Initialize states.  Remember to use volatile 
 
 int main(){
 
@@ -58,11 +58,7 @@ int main(){
   }
   // move cursor
   moveCursor(1,11); */
- 
-
-// while loop from lab 2 for the blink LEDs
-  delayMs(100/multiplier);
-  //this is for lab 3 below
+//this is for lab 3 below
 
   //also got these from lecture slides
   moveCursor(0, 0); // moves the cursor to 0,0 position
@@ -74,6 +70,10 @@ int main(){
   moveCursor(1,10);
 
   //this is for lab 3 above
+
+// while loop from lab 2 for the blink LEDs
+  delayMs(100/multiplier);
+
 
 	while (1) {
     //after 100ms code needs to increment the binary number which is represented by LEDs
