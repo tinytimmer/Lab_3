@@ -27,26 +27,28 @@ void initLCDPins(){
 //PB6 = pin 12 on board -> RS pin
 //PB4 = pin 10 on board -> enable pin
 
-//decided to put in this function to make it easier to change the enable pin
+/* //decided to put in this function to make it easier to change the enable pin
 void assertEnable(){
   PORTB |= (1 << PORTB4); //enable pin is high
   delayUs(1);
   PORTB &= ~(1 << PORTB4); //enable pin is low
   delayUs(1);
-}
+} */
 
 /* 1. Assert bits to pins connected to DB[7:4] on the LCD screen
  *      a. data is an unsigned char which has 8 bits. Therefore, you
  *         need assign the bottom 4 bits of "data" to the appropriate bits in
- *         PORTA
+ *         PORTA`
  *  2. This is a "command" signal, meaning RS should be Low, NOTE TO SELF: why is low, whuolsnt we switch?
  *  3. Assert high on enable pin, delay, and asset low on enable pin
  *  4. delay the provided number in MICROseconds.
  */
 void fourBitCommandWithDelay(unsigned char data, unsigned int delay){
-  PORTB |= (1 << PORTB6);
   PORTA = (PORTA & 0xF0) | (data & 0x0F); //asserts bits here
-  assertEnable();
+  PORTB &= ~(1 << PORTB6);
+  PORTB |= (1 << PORTB4); 
+  delayUs(1);
+  PORTB &= !(1 << PORTB);
   delayUs(delay);
 }
 
@@ -63,21 +65,22 @@ void fourBitCommandWithDelay(unsigned char data, unsigned int delay){
  * 6. delay the provided number in MICROseconds.
  */
 void eightBitCommandWithDelay(unsigned char command, unsigned int delay){
+  PORTA = ((PORTA & 0xF0) | ((command >> 4) & 0x0F));// asserts the bits to top here
   PORTB &= ~(1 << PORTB6); 
-  PORTA = (PORTA & 0xF0)|(command >> 4);// asserts the bits to top here
-  assertEnable();
+  PORTB |= (1 << PORTB6);
+  delayUs(1);
 
-  PORTA = (PORTA & 0xF0) | (command & 0x0F); //assert bits to the bottom here
-  assertEnable();
+  PORTB &= ~(1 << PORTB4);
+  PORTA = ((PORTA & 0xF0) | (command & 0x0F)); //assert bits to the bottom here
+  PORTB |= (1 << PORTB4);
+  delayUs(1); 
+
+  PORTB &= ~(1 << PORTB4);
   delayUs(delay);
 }
 
-void writeCharacter(unsigned char character){
-  //This function use an 8 bit command to set the CGRAM Address, got from lecture slides
-eightBitCommandWithDelay(character, 46);
-}
-
-/* Similar to eightBitCommandWithDelay except that now RS should be high
+/*
+Similar to eightBitCommandWithDelay except that now RS should be high
  * 1. Assert bits to pins connected to DB[7:4] on the LCD screen
  * 2. This is a "data" signal, meaning RS should be high
  * 3. Assert high on enable pin, delay, and asset low on enable pin
@@ -86,7 +89,23 @@ eightBitCommandWithDelay(character, 46);
  * 6. delay is always 46 MICROseconds for a character write
  *
  * why did this repeat if this is a different function?
- * /
+*/ 
+void writeCharacter(unsigned char character){
+  PORTA = ((PORTA & 0xF0) | ((character >> 4)  & 0x0F));
+  PORTB |= (1 << PORTB6); 
+  PORTB |= (1 << PORTB4);
+  delayUs(1);
+  PORTB &= ~(1 << PORTB4);
+  
+  PORTA = ((PORTA & 0xF0) | (character & 0x0F));
+  PORTB |= (1 << PORTB4);
+  delayUs(1);
+  PORTB &= ~(1 << PORTB4);
+  
+  delayUs(53);
+}
+
+
 
 
 
@@ -94,6 +113,8 @@ eightBitCommandWithDelay(character, 46);
  * Writes a provided string such as "Hello!" to the LCD screen. You should
  * remember that a c string always ends with the '\0' character and
  * that this should just call writeCharacter multiple times.
+ * 
+ * got this from lecture slides
  */
 void writeString(const char *string){
     int i=0;
@@ -117,6 +138,8 @@ void writeString(const char *string){
 /*
  * This moves the LCD cursor to a specific place on the screen.
  * This can be done using the eightBitCommandWithDelay with correct arguments
+ * 
+ * got this from lecture slides
  */
 void moveCursor(unsigned char x, unsigned char y){
 	//to or 0x80 (setting D7 to 1), or'd with x << 6
@@ -124,11 +147,11 @@ void moveCursor(unsigned char x, unsigned char y){
   eightBitCommandWithDelay(((0x80) | (x << 6) | (y)), 53);
 }
 
-//got this from lecture slides
+/* //got this from lecture slides
  void setCGRAM(unsigned char x){
   //This function use an 8 bit command to set the CGRAM Address
   eightBitCommandWithDelay(x, 53);
-}
+} */
  
 
 
