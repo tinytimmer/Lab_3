@@ -39,7 +39,7 @@ void assertEnable(){
  *      a. data is an unsigned char which has 8 bits. Therefore, you
  *         need assign the bottom 4 bits of "data" to the appropriate bits in
  *         PORTA`
- *  2. This is a "command" signal, meaning RS should be Low, NOTE TO SELF: why is low, whuolsnt we switch?
+ *  2. This is a "command" signal, meaning RS should be Low
  *  3. Assert high on enable pin, delay, and asset low on enable pin
  *  4. delay the provided number in MICROseconds.
  */
@@ -48,7 +48,7 @@ void fourBitCommandWithDelay(unsigned char data, unsigned int delay){
   PORTB &= ~(1 << PORTB6);
   PORTB |= (1 << PORTB4); 
   delayUs(1);
-  PORTB &= !(1 << PORTB);
+  PORTB &= ~(1 << PORTB4);
   delayUs(delay);
 }
 
@@ -67,7 +67,7 @@ void fourBitCommandWithDelay(unsigned char data, unsigned int delay){
 void eightBitCommandWithDelay(unsigned char command, unsigned int delay){
   PORTA = ((PORTA & 0xF0) | ((command >> 4) & 0x0F));// asserts the bits to top here
   PORTB &= ~(1 << PORTB6); 
-  PORTB |= (1 << PORTB6);
+  PORTB |= (1 << PORTB4);
   delayUs(1);
 
   PORTB &= ~(1 << PORTB4);
