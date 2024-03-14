@@ -53,10 +53,10 @@ int main(){
   moveCursor(0, 0); // moves the cursor to 0,0 position
   writeString("Currrent mode is:"); //write top line of LCD
   moveCursor(1, 0); // moves the cursor to 1,0 position
-  writeString("Slow"); //display speed of default mode
+  //writeString("Slow"); //display speed of default mode
 
   //writeString(0xF2); //display speed of default mode
-  //writeCharacter(0xF2);
+  writeCharacter(0xF2);
   //moveCursor(1,10);
 
 // writing special character
