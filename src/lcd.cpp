@@ -88,7 +88,6 @@ Similar to eightBitCommandWithDelay except that now RS should be high
  * 5. Assert high on enable pin, delay, and asset low on enable pin
  * 6. delay is always 46 MICROseconds for a character write
  *
- * why did this repeat if this is a different function?
 */ 
 void writeCharacter(unsigned char character){
   PORTA = ((PORTA & 0xF0) | ((character >> 4)  & 0x0F));
@@ -102,11 +101,8 @@ void writeCharacter(unsigned char character){
   delayUs(1);
   PORTB &= ~(1 << PORTB4);
   
-  delayUs(53);
+  delayUs(46);
 }
-
-
-
 
 
 /*
@@ -117,14 +113,19 @@ void writeCharacter(unsigned char character){
  * got this from lecture slides
  */
 void writeString(const char *string){
-    int i=0;
+  while (*string != '\0'){
+    writeCharacter(*string);
+    string++;
+  }  
+    
+    /* int i=0;
     while(string[i]!='\0')
-    /* loop will go on till the NULL character
-    in the string */
+    //loop will go on till the NULL character
+    in the string
     { writeCharacter(string[i]);
     // sending data on LCD byte by byte
     i++;
-    }
+    } */
 
   /* unsigned int i = 0;
     while(i < strlen(string)){
@@ -144,15 +145,16 @@ void writeString(const char *string){
 void moveCursor(unsigned char x, unsigned char y){
 	//to or 0x80 (setting D7 to 1), or'd with x << 6
   //(sets DB6 to either a 0 or 1) (row 0 or row 1), or'd with y
+
   eightBitCommandWithDelay(((0x80) | (x << 6) | (y)), 53);
 }
 
-/* //got this from lecture slides
+/*  //got this from lecture slides
  void setCGRAM(unsigned char x){
   //This function use an 8 bit command to set the CGRAM Address
   eightBitCommandWithDelay(x, 53);
-} */
- 
+} 
+  */
 
 
 /* This is the procedure outline on the LCD datasheet page 4 out of 9.
