@@ -47,39 +47,39 @@ int main(){
   initTimer0();
   sei(); // Enable global interrupts.
 
-//this is for lab 3 below
-
-  //also got these from lecture slides
-  moveCursor(0, 0); // moves the cursor to 0,0 position
-  writeString("Currrent mode is:"); //write top line of LCD
-  moveCursor(1, 0); // moves the cursor to 1,0 position
-  writeString("Slow"); //display speed of default mode
-
-  //writeString(0xF2); //display speed of default mode
-  //writeCharacter(0xF2);
-  //moveCursor(1,10);
-
-// writing special character
-/*   unsigned char ArrayCh[]={0x00, 0x00, 0x0a, 0x00, 0x1f, 0x11, 0x0e, 0x00};
-  writeCharacter(0x00);
-  setCGRAM(0X40);
-  unsigned int i=0;
-  while(i<=7){
-    writeCharacter(ArrayCh[i]);
-    i++;
-  }
-  // move cursor
-  moveCursor(1,11); */
-
-  //this is for lab 3 above
-  
-
-
 // while loop from lab 2 for the blink LEDs
  // delayMs(100/multiplier);
 
 
 	while (1) {
+    //this is for lab 3 below
+
+    //also got these from lecture slides
+    moveCursor(0, 0); // moves the cursor to 0,0 position
+    writeString("Current mode is:"); //write top line of LCD
+    moveCursor(1, 0); // moves the cursor to 1,0 position
+    //writeString("SLOW"); //display speed of default mode
+
+    //writeString(0xF2); //display speed of default mode
+    moveCursor(1,10); 
+    writeCharacter(0xF2);//writes theta at (1,10) and stays there for every button press
+    
+
+  // writing special character
+  /*   unsigned char ArrayCh[]={0x00, 0x00, 0x0a, 0x00, 0x1f, 0x11, 0x0e, 0x00};
+    writeCharacter(0x00);
+    setCGRAM(0X40);
+    unsigned int i=0;
+    while(i<=7){
+      writeCharacter(ArrayCh[i]);
+      i++;
+    }
+    // move cursor
+    moveCursor(1,11); */
+
+    //this is for lab 3 above
+    
+    
     //after 100ms code needs to increment the binary number which is represented by LEDs
     //here is the delay
     delayMs(100/multiplier);
@@ -109,11 +109,15 @@ int main(){
       if (multiplier == NORMAL_SPEED)
       {
         multiplier = DOUBLE_SPEED;
+        moveCursor(1, 0);
+        writeString("FAST");
       }
 
       else if (multiplier == DOUBLE_SPEED)
       {
         multiplier = NORMAL_SPEED;
+        moveCursor(1, 0);
+        writeString("SLOW");
       }
       
       state = wait_press;
@@ -145,6 +149,7 @@ ISR(PCINT0_vect){
   if (state == wait_press)
   {
     state = button_press;
+    
   }
   else if (state == wait_release)
   {
