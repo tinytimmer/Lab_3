@@ -47,7 +47,7 @@ void delayUs(unsigned int delay){
 
 /* Initialize timer 0, you should not turn the timer on here.
 * You will need to use CTC mode
-    Below is from lab 2, lines 26-68
+    Below is from lab 2
  */
 void initTimer0(){
     //set up timer0 for ctc mode
